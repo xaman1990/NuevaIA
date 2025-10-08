@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Org-IA - Asistente con Visión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2f4a 50%, #0f1f38 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: linear-gradient(135deg, #1a2f4a 0%, #0f1f38 100%);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 100px rgba(59, 130, 246, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f2847 0%, #1a365d 100%);
+            color: white;
+            padding: 25px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .estado {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .estado-indicador {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #34d399;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: linear-gradient(180deg, #0f1f38 0%, #1a2f4a 100%);
+        }
+
+        .mensaje {
+            margin-bottom: 20px;
+            display: flex;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mensaje.usuario {
+            justify-content: flex-end;
+        }
+
+        .mensaje.asistente {
+            justify-content: flex-start;
+        }
+
+        .mensaje-contenido {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .mensaje.usuario .mensaje-contenido {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .mensaje.asistente .mensaje-contenido {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+            color: #e0e7ff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .input-container {
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #0f2847 0%, #1a365d 100%);
+            border-top: 2px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #mensajeInput {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            background: rgba(15, 40, 71, 0.6);
+            color: #e0e7ff;
+        }
+
+        #mensajeInput::placeholder {
+            color: rgba(224, 231, 255, 0.5);
+        }
+
+        #mensajeInput:focus {
+            border-color: #3b82f6;
+            background: rgba(15, 40, 71, 0.8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-voz {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-voz.escuchando {
+            background: #ef4444;
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+
+        .btn-limpiar {
+            background: rgba(71, 85, 105, 0.6);
+            color: #e0e7ff;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-limpiar:hover {
+            background: rgba(71, 85, 105, 0.8);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-camara, .btn-pantalla {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(71, 85, 105, 0.6);
+            color: #e0e7ff;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-camara:hover, .btn-pantalla:hover {
+            background: rgba(71, 85, 105, 0.8);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-camara.activo {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-pantalla.activo {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .video-preview {
+            width: 150px;
+            height: 100px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #3b82f6;
+            display: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .video-preview.activo {
+            display: block;
+        }
+
+        .controles-video {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .cargando {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #a5b4fc;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        .cargando.activo {
+            display: flex;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            color: #a5b4fc;
+            padding: 60px 20px;
+        }
+
+        .mensaje-vacio h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .mensaje-vacio p {
+            font-size: 16px;
+            color: #cbd5e1;
+        }
+
+        .mensaje-vacio ul {
+            color: #cbd5e1;
+        }
+
+        .mensaje-vacio strong {
+            color: #60a5fa;
+        }
+
+        .error-mensaje {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 30px;
+            display: none;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .error-mensaje.activo {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .estado {
+                font-size: 12px;
+            }
+
+            .chat-container {
+                padding: 15px;
+                padding-bottom: 10px;
+            }
+
+            .mensaje-contenido {
+                max-width: 85%;
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+
+            .mensaje-vacio {
+                padding: 30px 15px;
+            }
+
+            .mensaje-vacio h2 {
+                font-size: 22px;
+            }
+
+            .mensaje-vacio p {
+                font-size: 14px;
+            }
+
+            .mensaje-vacio ul {
+                font-size: 12px;
+                max-width: 90%;
+            }
+
+            .input-container {
+                padding: 12px 15px;
+                flex-direction: column;
+                gap: 8px;
+                position: sticky;
+                bottom: 0;
+                background: linear-gradient(135deg, #0f2847 0%, #1a365d 100%);
+            }
+
+            .controles-video {
+                width: 100%;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .btn-limpiar, .btn-camara, .btn-pantalla {
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 80px;
+            }
+
+            .video-preview {
+                width: 100px;
+                height: 70px;
+            }
+
+            .input-wrapper {
+                width: 100%;
+            }
+
+            #mensajeInput {
+                font-size: 16px;
+                padding: 12px 50px 12px 15px;
+            }
+
+            .btn-voz {
+                width: 45px;
+                height: 45px;
+                right: 3px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+
+            .cargando {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .error-mensaje {
+                margin: 8px 15px;
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Org-IA</h1>
+            <div class="estado">
+                <div class="estado-indicador" id="estadoIndicador"></div>
+                <span id="estadoTexto">Conectado</span>
+            </div>
+        </div>
+
+        <div class="error-mensaje" id="errorMensaje"></div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="mensaje-vacio">
+                <h2>👋 ¡Hola! Soy Org-IA</h2>
+                <p style="font-size: 16px; margin-top: 10px; color: #cbd5e1;">🎤 Haz clic en el micrófono para empezar</p>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; max-width: 500px; margin-left: auto; margin-right: auto; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #60a5fa;">🔄 Sistema de Doble Modelo:</p>
+                    <ul style="text-align: left; font-size: 13px; line-height: 1.8; color: #cbd5e1;">
+                        <li>👁️ <strong style="color: #60a5fa;">LLaVA</strong> interpreta lo que ve la cámara</li>
+                        <li>🧠 <strong style="color: #a78bfa;">Qwen 3</strong> responde de forma natural</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 15px; font-size: 14px; color: #60a5fa;"><strong>Funciones:</strong></p>
+                <ul style="text-align: left; margin: 10px auto; max-width: 450px; font-size: 13px; color: #cbd5e1; line-height: 1.8;">
+                    <li>📷 <strong style="color: #34d399;">Cámara</strong> - Pregunta sobre objetos que muestres</li>
+                    <li>🖥️ <strong style="color: #3b82f6;">Pantalla</strong> - Ayuda con código o imágenes</li>
+                    <li>💬 <strong style="color: #a78bfa;">Chat</strong> - Conversación normal sin cámara</li>
+                    <li>🎤 <strong style="color: #60a5fa;">Voz Continua</strong> - Habla y escucha sin parar</li>
+                </ul>
+                <p style="margin-top: 15px; font-size: 12px; color: #94a3b8;">
+                    <span style="color: #ef4444;">●</span> Rojo = Escuchando | 
+                    <span style="color: #34d399;">●</span> Verde = Conectado | 
+                    Sin emoticonos en voz
+                </p>
+            </div>
+        </div>
+
+        <div class="cargando" id="cargando">
+            <div class="spinner"></div>
+            <span>Org-IA está procesando...</span>
+        </div>
+
+        <div class="input-container">
+            <div class="controles-video">
+                <button class="btn btn-limpiar" onclick="limpiarChat()" title="Limpiar conversación">
+                    🗑️
+                </button>
+                <button class="btn-camara" id="btnCamara" onclick="toggleCamara()" title="Activar/Desactivar Cámara">
+                    📷 Cámara
+                </button>
+                <button class="btn-pantalla" id="btnPantalla" onclick="togglePantalla()" title="Compartir Pantalla">
+                    🖥️ Pantalla
+                </button>
+                <video id="videoPreview" class="video-preview" autoplay muted></video>
+            </div>
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="mensajeInput" 
+                    placeholder="Habla con Org-IA o escribe aquí..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="btn-voz" id="btnVoz" onclick="toggleVoz()" title="Hablar">
+                    🎤
+                </button>
+            </div>
+            <button class="btn btn-primary" onclick="enviarMensaje()">
+                Enviar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Canvas oculto para capturar frames -->
+    <canvas id="capturaCanvas" style="display: none;"></canvas>
+
+    <script>
+        let sessionId = generateSessionId();
+        let reconocimiento = null;
+        let escuchando = false;
+        let vocesDisponibles = [];
+        
+        // Variables para video
+        let streamVideo = null;
+        let camaraActiva = false;
+        let pantallaActiva = false;
+        
+        // Cargar voces disponibles
+        function cargarVoces() {
+            vocesDisponibles = window.speechSynthesis.getVoices();
+            console.log('Voces disponibles en español:', 
+                vocesDisponibles.filter(v => v.lang.startsWith('es')).map(v => v.name + ' (' + v.lang + ')'));
+        }
+        
+        // Cargar voces cuando estén disponibles
+        if (window.speechSynthesis) {
+            cargarVoces();
+            window.speechSynthesis.onvoiceschanged = cargarVoces;
+        }
+        
+        // Función para filtrar emoticonos del texto
+        function filtrarEmoticonos(texto) {
+            // Eliminar emoticonos comunes
+            return texto.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
+                       .replace(/[🎤🎙️📝🤖💬⌨️🗑️🔊📷🖥️🔴✅❌⏱️🔄]/g, '')
+                       .trim();
+        }
+        
+        // Función para capturar frame del video
+        function capturarFrame() {
+            if (!streamVideo) return null;
+            
+            const video = document.getElementById('videoPreview');
+            const canvas = document.getElementById('capturaCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamaño del canvas al video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Dibujar el frame actual
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convertir a base64
+            return canvas.toDataURL('image/jpeg', 0.8);
+        }
+        
+        // Toggle cámara
+        async function toggleCamara() {
+            const btnCamara = document.getElementById('btnCamara');
+            const video = document.getElementById('videoPreview');
+            
+            if (camaraActiva) {
+                // Desactivar cámara
+                if (streamVideo) {
+                    streamVideo.getTracks().forEach(track => track.stop());
+                    streamVideo = null;
+                }
+                video.classList.remove('activo');
+                btnCamara.classList.remove('activo');
+                camaraActiva = false;
+            } else {
+                try {
+                    // Activar cámara
+                    streamVideo = await navigator.mediaDevices.getUserMedia({ 
+                        video: { width: 640, height: 480 }, 
+                        audio: false 
+                    });
+                    video.srcObject = streamVideo;
+                    video.classList.add('activo');
+                    btnCamara.classList.add('activo');
+                    camaraActiva = true;
+                    
+                    // Desactivar pantalla si estaba activa
+                    document.getElementById('btnPantalla').classList.remove('activo');
+                    pantallaActiva = false;
+                } catch (error) {
+                    console.error('Error al acceder a la cámara:', error);
+                    mostrarError('No se pudo acceder a la cámara');
+                }
+            }
+        }
+        
+        // Toggle compartir pantalla
+        async function togglePantalla() {
+            const btnPantalla = document.getElementById('btnPantalla');
+            const video = document.getElementById('videoPreview');
+            
+            if (pantallaActiva) {
+                // Desactivar pantalla
+                if (streamVideo) {
+                    streamVideo.getTracks().forEach(track => track.stop());
+                    streamVideo = null;
+                }
+                video.classList.remove('activo');
+                btnPantalla.classList.remove('activo');
+                pantallaActiva = false;
+            } else {
+                try {
+                    // Activar compartir pantalla
+                    streamVideo = await navigator.mediaDevices.getDisplayMedia({ 
+                        video: { width: 1280, height: 720 }, 
+                        audio: false 
+                    });
+                    video.srcObject = streamVideo;
+                    video.classList.add('activo');
+                    btnPantalla.classList.add('activo');
+                    pantallaActiva = true;
+                    
+                    // Desactivar cámara si estaba activa
+                    document.getElementById('btnCamara').classList.remove('activo');
+                    camaraActiva = false;
+                    
+                    // Detectar cuando el usuario deja de compartir
+                    streamVideo.getVideoTracks()[0].onended = () => {
+                        togglePantalla();
+                    };
+                } catch (error) {
+                    console.error('Error al compartir pantalla:', error);
+                    mostrarError('No se pudo compartir la pantalla');
+                }
+            }
+        }
+
+        // Inicializar reconocimiento de voz si está disponible
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            reconocimiento = new SpeechRecognition();
+            reconocimiento.lang = 'es-ES';
+            reconocimiento.continuous = false;
+            reconocimiento.interimResults = false;
+
+            reconocimiento.onresult = function(event) {
+                const texto = event.results[0][0].transcript;
+                document.getElementById('mensajeInput').value = texto;
+                escuchando = false;
+                document.getElementById('btnVoz').classList.remove('escuchando');
+                document.getElementById('btnVoz').textContent = '🎤';
+                
+                // Enviar automáticamente el mensaje después de capturar el audio
+                setTimeout(() => enviarMensaje(), 300);
+            };
+
+            reconocimiento.onerror = function(event) {
+                console.error('Error de reconocimiento:', event.error);
+                escuchando = false;
+                document.getElementById('btnVoz').classList.remove('escuchando');
+                document.getElementById('btnVoz').textContent = '🎤';
+                mostrarError('Error al reconocer la voz. Intenta de nuevo.');
+            };
+
+            reconocimiento.onend = function() {
+                escuchando = false;
+                document.getElementById('btnVoz').classList.remove('escuchando');
+                document.getElementById('btnVoz').textContent = '🎤';
+            };
+        } else {
+            // Ocultar botón de voz si no está disponible
+            document.getElementById('btnVoz').style.display = 'none';
+        }
+
+        // Verificar estado de Ollama al cargar
+        verificarEstado();
+        setInterval(verificarEstado, 30000); // Verificar cada 30 segundos
+
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function verificarEstado() {
+            fetch('/api/estado')
+                .then(response => response.json())
+                .then(data => {
+                    const indicador = document.getElementById('estadoIndicador');
+                    const texto = document.getElementById('estadoTexto');
+                    
+                    if (data.estado === 'conectado') {
+                        indicador.style.background = '#4ade80';
+                        texto.textContent = 'Conectado';
+                    } else {
+                        indicador.style.background = '#ef4444';
+                        texto.textContent = 'Desconectado';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('estadoIndicador').style.background = '#ef4444';
+                    document.getElementById('estadoTexto').textContent = 'Error';
+                });
+        }
+
+        function toggleVoz() {
+            if (!reconocimiento) {
+                mostrarError('El reconocimiento de voz no está disponible en este navegador.');
+                return;
+            }
+
+            if (escuchando) {
+                reconocimiento.stop();
+                escuchando = false;
+                document.getElementById('btnVoz').classList.remove('escuchando');
+                document.getElementById('btnVoz').textContent = '🎤';
+            } else {
+                reconocimiento.start();
+                escuchando = true;
+                document.getElementById('btnVoz').classList.add('escuchando');
+                document.getElementById('btnVoz').textContent = '⏹️';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                enviarMensaje();
+            }
+        }
+
+        async function enviarMensaje() {
+            const input = document.getElementById('mensajeInput');
+            const mensaje = input.value.trim();
+
+            if (!mensaje) return;
+
+            // Limpiar mensaje vacío si existe
+            const mensajeVacio = document.querySelector('.mensaje-vacio');
+            if (mensajeVacio) {
+                mensajeVacio.remove();
+            }
+
+            // Agregar mensaje del usuario
+            agregarMensaje(mensaje, 'usuario');
+            input.value = '';
+
+            // Capturar imagen si hay video activo
+            let imagenBase64 = null;
+            if (camaraActiva || pantallaActiva) {
+                imagenBase64 = capturarFrame();
+                console.log('Imagen capturada para enviar');
+            }
+            
+            // Mostrar indicador de carga
+            document.getElementById('cargando').classList.add('activo');
+
+            try {
+                const payload = {
+                    mensaje: mensaje,
+                    session_id: sessionId
+                };
+                
+                // Agregar imagen si está disponible
+                if (imagenBase64) {
+                    payload.imagen = imagenBase64;
+                }
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Filtrar el contenido <think>...</think> del modelo
+                    let respuestaLimpia = data.respuesta;
+                    respuestaLimpia = respuestaLimpia.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+                    
+                    agregarMensaje(respuestaLimpia, 'asistente');
+                    
+                    // Síntesis de voz con respuesta filtrada y voz natural en español
+                    if ('speechSynthesis' in window && respuestaLimpia) {
+                        // Filtrar emoticonos antes de hablar
+                        const textoParaVoz = filtrarEmoticonos(respuestaLimpia);
+                        const utterance = new SpeechSynthesisUtterance(textoParaVoz);
+                        
+                        // Buscar una voz en español más natural (premium/enhanced primero)
+                        let vozEspanol = vocesDisponibles.find(voz => 
+                            voz.lang.startsWith('es') && (voz.name.includes('Premium') || voz.name.includes('Enhanced'))
+                        );
+                        
+                        // Si no hay premium/enhanced, buscar voces nativas de macOS
+                        if (!vozEspanol) {
+                            vozEspanol = vocesDisponibles.find(voz => 
+                                voz.lang.startsWith('es') && (voz.name.includes('Mónica') || voz.name.includes('Paulina') || voz.name.includes('Jorge'))
+                            );
+                        }
+                        
+                        // Si aún no hay, cualquier voz en español
+                        if (!vozEspanol) {
+                            vozEspanol = vocesDisponibles.find(voz => voz.lang.startsWith('es'));
+                        }
+                        
+                        if (vozEspanol) {
+                            utterance.voice = vozEspanol;
+                            console.log('Usando voz:', vozEspanol.name);
+                        }
+                        
+                        utterance.lang = 'es-ES';
+                        utterance.rate = 0.95; // Velocidad más natural
+                        utterance.pitch = 1.0; // Tono normal
+                        utterance.volume = 1.0; // Volumen máximo
+                        
+                        // Reactivar el micrófono automáticamente después de hablar
+                        utterance.onend = function() {
+                            console.log('Respuesta terminada, reactivando micrófono...');
+                            setTimeout(() => {
+                                if (!escuchando && reconocimiento) {
+                                    toggleVoz();
+                                }
+                            }, 800);
+                        };
+                        
+                        // Por si hay error, también reactivar
+                        utterance.onerror = function(event) {
+                            console.error('Error en síntesis de voz:', event);
+                            setTimeout(() => {
+                                if (!escuchando && reconocimiento) {
+                                    toggleVoz();
+                                }
+                            }, 500);
+                        };
+                        
+                        window.speechSynthesis.speak(utterance);
+                    } else {
+                        // Si no hay respuesta limpia o no hay síntesis, reactivar inmediatamente
+                        setTimeout(() => {
+                            if (!escuchando && reconocimiento) {
+                                toggleVoz();
+                            }
+                        }, 500);
+                    }
+                } else {
+                    mostrarError(data.error || 'Error al enviar el mensaje');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('Error de conexión con el servidor');
+            } finally {
+                document.getElementById('cargando').classList.remove('activo');
+            }
+        }
+
+        function agregarMensaje(texto, tipo) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            const mensajeDiv = document.createElement('div');
+            mensajeDiv.className = `mensaje ${tipo}`;
+            
+            const contenidoDiv = document.createElement('div');
+            contenidoDiv.className = 'mensaje-contenido';
+            contenidoDiv.textContent = texto;
+            
+            mensajeDiv.appendChild(contenidoDiv);
+            chatContainer.appendChild(mensajeDiv);
+            
+            // Scroll automático al último mensaje
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function limpiarChat() {
+            if (!confirm('¿Estás seguro de que quieres limpiar la conversación?')) {
+                return;
+            }
+
+            try {
+                await fetch('/api/limpiar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId
+                    })
+                });
+
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.innerHTML = `
+                    <div class="mensaje-vacio">
+                        <h2 style="background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">👋 Conversación reiniciada</h2>
+                        <p style="font-size: 14px; margin-top: 15px; color: #cbd5e1;">Continúa hablando cuando el micrófono se reactive</p>
+                        <p style="font-size: 12px; margin-top: 8px; color: #94a3b8;">Botón rojo 🔴 = Escuchando</p>
+                    </div>
+                `;
+                
+                // Reactivar el micrófono después de limpiar
+                setTimeout(() => {
+                    if (!escuchando && reconocimiento) {
+                        toggleVoz();
+                    }
+                }, 500);
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('Error al limpiar el chat');
+            }
+        }
+
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('errorMensaje');
+            errorDiv.textContent = '❌ ' + mensaje;
+            errorDiv.classList.add('activo');
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('activo');
+            }, 5000);
+        }
+        
+        // NO activar automáticamente al cargar - el usuario debe hacer clic primero
+        // Después de la primera activación, se mantendrá activo continuamente
+    </script>
+</body>
+</html>
+

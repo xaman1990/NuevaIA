@@ -1,0 +1,17 @@
+# Asistente de Voz con Qwen 3
+# Dependencias necesarias
+
+# Para reconocimiento de voz
+SpeechRecognition>=3.10.0
+PyAudio>=0.2.13
+
+# Para síntesis de voz
+pyttsx3>=2.90
+
+# Para comunicación con Ollama
+requests>=2.31.0
+
+# Para la interfaz web (opcional)
+flask>=3.0.0
+flask-cors>=4.0.0
+

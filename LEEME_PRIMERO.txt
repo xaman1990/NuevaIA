@@ -1,0 +1,165 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║       🎙️  ASISTENTE DE VOZ CON QWEN 3 - GUÍA RÁPIDA        ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+¡Hola! Aquí tienes todo listo para conversar con tu modelo Qwen 3 por voz.
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  PASO 1: INSTALAR (Solo la primera vez)                    │
+└─────────────────────────────────────────────────────────────┘
+
+En la terminal, ejecuta:
+
+    cd /Users/xmn/Documents/Trabajo/NuevaIA
+    ./instalar.sh
+
+Esto instalará automáticamente todo lo necesario.
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  PASO 2: VERIFICAR QUE TODO FUNCIONE                        │
+└─────────────────────────────────────────────────────────────┘
+
+Antes de usar el asistente, verifica tu sistema:
+
+    source venv/bin/activate
+    python verificar_sistema.py
+
+Este script te dirá si falta algo.
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  PASO 3: USAR EL ASISTENTE                                  │
+└─────────────────────────────────────────────────────────────┘
+
+Tienes DOS opciones:
+
+
+  OPCIÓN A - Línea de Comandos 🎤
+  ────────────────────────────────
+
+    ./iniciar_voz.sh
+
+    • Habla cuando veas "🎤 Escuchando..."
+    • Di "salir" para terminar
+    • Di "limpiar historial" para reiniciar
+
+
+  OPCIÓN B - Interfaz Web 🌐 (RECOMENDADO)
+  ─────────────────────────────────────────
+
+    ./iniciar_web.sh
+
+    Luego abre tu navegador en:
+    👉 http://localhost:5000
+
+    • Interfaz bonita y fácil de usar
+    • Botón de micrófono 🎤
+    • También puedes escribir ⌨️
+    • Historial visual de la conversación
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  ¿PROBLEMAS?                                                │
+└─────────────────────────────────────────────────────────────┘
+
+Problema: "No se pudo conectar con Ollama"
+Solución: En otra terminal, ejecuta: ollama serve
+
+Problema: "No se detectó voz"
+Solución: 
+  1. Verifica permisos del micrófono
+  2. Habla más cerca del micrófono
+  3. Reduce el ruido de fondo
+
+Problema: Error instalando PyAudio
+Solución: brew install portaudio && pip install pyaudio
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  ARCHIVOS DEL PROYECTO                                      │
+└─────────────────────────────────────────────────────────────┘
+
+📄 LEEME_PRIMERO.txt    → Este archivo (guía rápida)
+📄 INICIO_RAPIDO.md     → Guía rápida en Markdown
+📄 README.md            → Documentación completa
+📄 requirements.txt     → Dependencias de Python
+
+🔧 instalar.sh          → Instala todo automáticamente
+🔍 verificar_sistema.py → Verifica que todo funcione
+
+🚀 iniciar_voz.sh       → Inicia versión de línea de comandos
+🚀 iniciar_web.sh       → Inicia interfaz web
+
+🐍 asistente_voz.py     → Código del asistente de voz
+🐍 app_web.py           → Código del servidor web
+
+📁 templates/           → Plantillas HTML
+   └── index.html       → Interfaz web
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  CAMBIAR EL MODELO                                          │
+└─────────────────────────────────────────────────────────────┘
+
+Ver modelos disponibles:
+
+    ollama list
+
+Usar un modelo específico:
+
+    ./iniciar_voz.sh --modelo qwen3:14b
+
+Para la web:
+
+    export QWEN_MODELO="qwen3:14b"
+    ./iniciar_web.sh
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  EJEMPLOS DE USO                                            │
+└─────────────────────────────────────────────────────────────┘
+
+  🎤 "¿Qué es Python?"
+  🤖 [Explica Python...]
+
+  🎤 "Cuéntame un chiste"
+  🤖 [Cuenta un chiste...]
+
+  🎤 "¿Cómo se hace una función en JavaScript?"
+  🤖 [Explica con ejemplos...]
+
+  🎤 "Salir"
+  🤖 "Hasta luego, que tengas un buen día"
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  CONSEJOS                                                   │
+└─────────────────────────────────────────────────────────────┘
+
+💡 Habla CLARAMENTE cerca del micrófono
+💡 Evita RUIDO DE FONDO para mejor reconocimiento
+💡 Las FRASES CORTAS funcionan mejor
+💡 El modelo RECUERDA el contexto de la conversación
+💡 Usa "limpiar historial" para empezar de cero
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  MÁS INFORMACIÓN                                            │
+└─────────────────────────────────────────────────────────────┘
+
+📖 README.md            → Documentación detallada
+📖 INICIO_RAPIDO.md     → Guía paso a paso
+
+
+╔══════════════════════════════════════════════════════════════╗
+║                      ¡DISFRUTA!                              ║
+║                                                              ║
+║  Para comenzar ahora mismo:                                 ║
+║    ./iniciar_web.sh                                         ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
