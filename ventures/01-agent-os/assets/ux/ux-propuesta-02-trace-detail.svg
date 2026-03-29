@@ -1,0 +1,34 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1366' height='768' viewBox='0 0 1366 768'>
+  <rect width='1366' height='768' fill='#0a0f1f'/>
+  <text x='24' y='40' fill='#e2e8f0' font-family='Arial' font-size='28'>Trace Detail — run r_98ab</text>
+
+  <rect x='24' y='60' width='1318' height='70' rx='10' fill='#111827' stroke='#334155'/>
+  <text x='40' y='95' fill='#93c5fd' font-family='Arial' font-size='16'>Agente: payroll-agent | Estado: failed | Riesgo: high | Correlation: c_7712</text>
+
+  <rect x='24' y='150' width='300' height='590' rx='10' fill='#0f172a' stroke='#334155'/>
+  <text x='40' y='185' fill='#f8fafc' font-family='Arial' font-size='18'>Timeline de pasos</text>
+  <circle cx='50' cy='230' r='8' fill='#22c55e'/><text x='70' y='236' fill='#cbd5e1' font-family='Arial' font-size='14'>1. context.build</text>
+  <circle cx='50' cy='280' r='8' fill='#22c55e'/><text x='70' y='286' fill='#cbd5e1' font-family='Arial' font-size='14'>2. policy.check</text>
+  <circle cx='50' cy='330' r='8' fill='#ef4444'/><text x='70' y='336' fill='#cbd5e1' font-family='Arial' font-size='14'>3. tool.invoke (denied)</text>
+  <line x1='50' y1='238' x2='50' y2='322' stroke='#64748b' stroke-width='2'/>
+
+  <rect x='340' y='150' width='650' height='590' rx='10' fill='#0f172a' stroke='#334155'/>
+  <text x='360' y='185' fill='#f8fafc' font-family='Arial' font-size='18'>Detalle del paso seleccionado</text>
+  <rect x='360' y='210' width='610' height='220' rx='8' fill='#111827'/>
+  <text x='380' y='240' fill='#fca5a5' font-family='monospace' font-size='14'>error_code: TOOL_DENIED</text>
+  <text x='380' y='270' fill='#cbd5e1' font-family='monospace' font-size='14'>tool: sap_api.delete_payment</text>
+  <text x='380' y='300' fill='#cbd5e1' font-family='monospace' font-size='14'>policy: deny_by_default + missing_allowlist</text>
+  <text x='380' y='330' fill='#cbd5e1' font-family='monospace' font-size='14'>actor: user_287 | workspace: ws_finance</text>
+
+  <rect x='360' y='450' width='610' height='270' rx='8' fill='#111827'/>
+  <text x='380' y='480' fill='#e2e8f0' font-family='Arial' font-size='16'>Acciones rápidas</text>
+  <rect x='380' y='500' width='180' height='36' rx='8' fill='#1d4ed8'/><text x='398' y='523' fill='white' font-family='Arial' font-size='14'>Exportar auditoría</text>
+  <rect x='570' y='500' width='180' height='36' rx='8' fill='#334155'/><text x='602' y='523' fill='white' font-family='Arial' font-size='14'>Abrir incidente</text>
+  <rect x='760' y='500' width='180' height='36' rx='8' fill='#7c2d12'/><text x='792' y='523' fill='white' font-family='Arial' font-size='14'>Bloquear tool</text>
+
+  <rect x='1006' y='150' width='336' height='590' rx='10' fill='#0f172a' stroke='#334155'/>
+  <text x='1026' y='185' fill='#f8fafc' font-family='Arial' font-size='18'>Panel de riesgo</text>
+  <text x='1026' y='225' fill='#fda4af' font-family='Arial' font-size='14'>• Acción sensible detectada</text>
+  <text x='1026' y='255' fill='#fda4af' font-family='Arial' font-size='14'>• Recomendación: aprobación humana</text>
+  <text x='1026' y='285' fill='#cbd5e1' font-family='Arial' font-size='14'>• SLA impact: alto</text>
+</svg>

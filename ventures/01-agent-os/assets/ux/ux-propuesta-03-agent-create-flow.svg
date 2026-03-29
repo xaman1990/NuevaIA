@@ -1,0 +1,36 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1366' height='768' viewBox='0 0 1366 768'>
+  <rect width='1366' height='768' fill='#0b1020'/>
+  <text x='24' y='40' fill='#e5e7eb' font-family='Arial' font-size='28'>Wizard: Crear agente seguro</text>
+  <rect x='24' y='60' width='1318' height='58' rx='10' fill='#111827' stroke='#334155'/>
+  <text x='44' y='96' fill='#93c5fd' font-family='Arial' font-size='16'>Paso 1 Identidad → Paso 2 Tools → Paso 3 Políticas → Paso 4 Validación → Paso 5 Publicar</text>
+
+  <rect x='24' y='140' width='1318' height='590' rx='10' fill='#0f172a' stroke='#334155'/>
+
+  <rect x='54' y='180' width='400' height='250' rx='10' fill='#111827'/>
+  <text x='74' y='215' fill='#f8fafc' font-family='Arial' font-size='18'>Paso 1: Identidad del agente</text>
+  <text x='74' y='250' fill='#cbd5e1' font-family='Arial' font-size='14'>Nombre, propósito, owner, workspace</text>
+  <rect x='74' y='270' width='360' height='36' rx='6' fill='#1f2937'/>
+  <rect x='74' y='320' width='360' height='36' rx='6' fill='#1f2937'/>
+
+  <rect x='484' y='180' width='400' height='250' rx='10' fill='#111827'/>
+  <text x='504' y='215' fill='#f8fafc' font-family='Arial' font-size='18'>Paso 2: Allowlist de tools</text>
+  <text x='504' y='250' fill='#cbd5e1' font-family='Arial' font-size='14'>Selecciona herramientas permitidas</text>
+  <rect x='504' y='270' width='360' height='32' rx='6' fill='#1f2937'/>
+  <rect x='504' y='310' width='360' height='32' rx='6' fill='#1f2937'/>
+  <rect x='504' y='350' width='360' height='32' rx='6' fill='#1f2937'/>
+
+  <rect x='914' y='180' width='400' height='250' rx='10' fill='#111827'/>
+  <text x='934' y='215' fill='#f8fafc' font-family='Arial' font-size='18'>Paso 3: Políticas y límites</text>
+  <text x='934' y='250' fill='#cbd5e1' font-family='Arial' font-size='14'>Cuotas, timeout, aprobaciones</text>
+  <rect x='934' y='270' width='360' height='32' rx='6' fill='#1f2937'/>
+  <rect x='934' y='310' width='360' height='32' rx='6' fill='#1f2937'/>
+
+  <rect x='54' y='460' width='1260' height='180' rx='10' fill='#111827'/>
+  <text x='74' y='495' fill='#f8fafc' font-family='Arial' font-size='18'>Paso 4: Validación pre-publicación</text>
+  <text x='74' y='525' fill='#a7f3d0' font-family='Arial' font-size='14'>✓ Campos obligatorios completos</text>
+  <text x='74' y='550' fill='#a7f3d0' font-family='Arial' font-size='14'>✓ Tools con owner y riesgo definidos</text>
+  <text x='74' y='575' fill='#fda4af' font-family='Arial' font-size='14'>⚠ Falta aprobación humana para tool de riesgo alto</text>
+
+  <rect x='1070' y='670' width='120' height='40' rx='8' fill='#374151'/><text x='1107' y='695' fill='#fff' font-family='Arial' font-size='14'>Atrás</text>
+  <rect x='1200' y='670' width='120' height='40' rx='8' fill='#2563eb'/><text x='1235' y='695' fill='#fff' font-family='Arial' font-size='14'>Publicar</text>
+</svg>
